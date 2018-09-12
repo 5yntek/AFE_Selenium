@@ -1,32 +1,21 @@
 import org.junit.jupiter.api.*;
 
+import java.util.concurrent.TimeUnit;
+
+
 public class FirefoxDriverTest extends AbstractGeneralTests {
 
 
-    @BeforeAll
-    public static void setUp() {
-        driver = new SeleniumConfig().getFireFoxDriver();
-    }
-
     @BeforeEach
-    public void navigate(){
-        try{
-            driver.navigate().to("http://pecunia2.zaw.uni-heidelberg.de/AFE_HD/coin_search_detailed");
-            driver.navigate().refresh();
-        }catch(Throwable ex){
-            setUp();
-            driver.navigate().to("http://pecunia2.zaw.uni-heidelberg.de/AFE_HD/coin_search_detailed");
-        }
-
+    public void setUp() {
+        driver = new SeleniumConfig().getFireFoxDriver();
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        driver.navigate().to("http://pecunia2.zaw.uni-heidelberg.de/AFE_HD/coin_search_detailed");
     }
+
 
     @AfterEach
-    public void tearDown() throws InterruptedException {
-        //Thread.sleep(2000);
-    }
-
-    @AfterAll
-    public static void quit(){
+    public void tearDown() {
         driver.quit();
     }
 }
