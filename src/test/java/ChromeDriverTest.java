@@ -2,6 +2,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -21,8 +22,9 @@ public class ChromeDriverTest extends AbstractGeneralTests {
         //Thread.sleep(2000);
         driver.quit();
     }
+
     @Test
-    public void dropDownMenu(){
+    public void dropDownMenu() {
         WebElement function = driver.findElement(By.name("function"));
         Select select = new Select(function);
         //List<String> list = select.getOptions().stream().map(WebElement::getText).collect(Collectors.toList());
@@ -36,21 +38,25 @@ public class ChromeDriverTest extends AbstractGeneralTests {
                 select.getFirstSelectedOption()
                         .getAttribute("value"),
                 "clear select");
+    }
+
+    @Test
+    public void dropDownMenuAutocomplete() throws InterruptedException {
+        WebElement function = driver.findElement(By.name("function"));
+        Select select = new Select(function);
         function.click();
         function.sendKeys("c");
+        function.sendKeys(Keys.RETURN);
         assertEquals("7",
-                select.getAllSelectedOptions().stream().map((x)->x.getAttribute("value")).filter((x)->!x.isEmpty()).findFirst().get(),
-                "Second select");
-        select.selectByVisibleText("");
-        assertNotEquals("7",
-                select.getFirstSelectedOption().
-                        getAttribute("value"),
-                "clear select");
-        function.click();
-        function.sendKeys("cc");
+                select.getFirstSelectedOption()
+                        .getAttribute("value"),
+                "First Select");
+        function.sendKeys("c");
+        function.sendKeys(Keys.RETURN);
         assertEquals("13",
                 select.getFirstSelectedOption()
-                        .getAttribute("value")
-                ,"Third select");
+                        .getAttribute("value"),
+                "Second Select");
+
     }
 }

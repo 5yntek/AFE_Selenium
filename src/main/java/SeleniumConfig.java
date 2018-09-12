@@ -1,31 +1,57 @@
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 public class SeleniumConfig {
 
-    private WebDriver driver;
-    private static List<String> drivers = List.of("E:\\Java\\geckodriver.exe",
+    private static List<String> firefoxDrivers = List.of("E:\\Java\\geckodriver.exe",
             "/home/patrick/Java/geckodriver");
+    private static List<String> chromeDrivers = List.of("E:\\Java\\chromedriver.exe",
+            "/home/patrick/Java/chromedriver");
 
-    public SeleniumConfig() {
-        Optional<String> d = drivers.stream().filter((x) -> Files.exists(Paths.get(x))).findFirst();
-        assert d.isPresent();
-        System.setProperty("webdriver.gecko.driver", d.get());
+
+    private Optional<Path> findFirstDriver(Collection<String> possibleDriver){
+        return possibleDriver.stream()
+                .map(Paths::get)
+                .filter(Files::isReadable)
+                .findFirst();
+    }
+
+    private Optional<Path> findChromeDriver(){
+        return findFirstDriver(chromeDrivers);
+    }
+
+    private Optional<Path> findFirefoxDriver(){
+        return findFirstDriver(firefoxDrivers);
+    }
+
+    private WebDriver loadFirefoxDriver(Path location) {
+        Optional<Path> d = findFirefoxDriver();
+        System.setProperty("webdriver.gecko.driver", d.orElseThrow().toString());
         Capabilities capabilities = DesiredCapabilities.firefox();
-        driver = new FirefoxDriver(capabilities);
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-}
+        return new FirefoxDriver(capabilities);
+    }
 
-    public WebDriver getDriver() {
-        return driver;
+    private WebDriver loadChromeDriver(Path location) {
+        Optional<Path> d = findChromeDriver();
+        System.setProperty("webdriver.chrome.driver", d.orElseThrow().toString());
+        Capabilities capabilities = DesiredCapabilities.chrome();
+        return new ChromeDriver(capabilities);
+    }
+
+    public WebDriver getChromeDriver() {
+        return loadChromeDriver(findChromeDriver().orElseThrow());
+    }
+
+    public WebDriver getFireFoxDriver() {
+        return loadFirefoxDriver(findFirefoxDriver().orElseThrow());
     }
 }
