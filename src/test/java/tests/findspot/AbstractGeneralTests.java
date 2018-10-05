@@ -1,8 +1,10 @@
 package tests.findspot;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -49,34 +51,33 @@ public abstract class AbstractGeneralTests {
         assertEquals("test", altNames.getAttribute("value"));
     }
 
-    @Disabled
+
     @Test
     public void chooseFindCategory() {
         driver.navigate().to(urlEnterFindspot);
         WebElement findCategory = driver.findElement(By.name("findspotfindcategory"));
         Select select = new Select(findCategory);
-        //TODO need values
-        assertEquals("todo", select.getOptions().get(0).getText());
+        select.selectByVisibleText("Frankfurt");
+        assertEquals("Frankfurt", select.getFirstSelectedOption().getText());
     }
 
-    @Disabled
     @Test
     public void chooseDiscoveryType() {
         driver.navigate().to(urlEnterFindspot);
         WebElement discoverytype = driver.findElement(By.name("discoverytype"));
         Select select = new Select(discoverytype);
-        //TODO need values
-        assertEquals("todo", select.getOptions().get(0).getText());
+        select.selectByIndex(1);
+        assertEquals("big discovery(Großartiger Fund)", select.getFirstSelectedOption().getText());
     }
 
-    @Disabled
+
     @Test
     public void chooseDepositionType() {
         driver.navigate().to(urlEnterFindspot);
         WebElement depositiontype = driver.findElement(By.name("depositiontype"));
         Select select = new Select(depositiontype);
-        //TODO need values
-        assertEquals("todo", select.getOptions().get(0).getText());
+        select.selectByIndex(1);
+        assertEquals("test english(test)", select.getFirstSelectedOption().getText());
     }
 
     @Test
@@ -352,7 +353,9 @@ public abstract class AbstractGeneralTests {
         final String division = "Frankfurt am Main";
         final String link = "link";
         final String bib = "Wigg";
+        final String findspotfindcategory = "Frankfurt";
 
+        // currently count of spots with name "testFindspot";
         final int countSpots = this.countFindSpot(name);
 
 
@@ -360,10 +363,10 @@ public abstract class AbstractGeneralTests {
         driver.findElement(By.id("findspot_name")).sendKeys(name);
 
         driver.findElement(By.id("findspot_alt_names")).sendKeys(altname);
-        driver.findElement(By.name("findspotfindcategory"));        //TODO
-        driver.findElement(By.name("discoverytype"));               //TODO
-        driver.findElement(By.name("depositiontype"));              //TODO
-        ;
+        driver.findElement(By.name("findspotfindcategory")).sendKeys(findspotfindcategory);
+        driver.findElement(By.name("discoverytype"));               //TODO is omitted?
+        driver.findElement(By.name("depositiontype"));              //TODO is omitted?
+
         driver.findElement(By.id("findspot_description")).sendKeys(description);
 
         driver.findElement(By.id("findspot_latitude")).sendKeys(latidtude);
@@ -391,7 +394,6 @@ public abstract class AbstractGeneralTests {
         System.err.println(driver.getCurrentUrl());
         assertEquals(this.urlFindspotEntered,
                 driver.getCurrentUrl());
-
         //tests
         assertEquals(
                 name,
@@ -399,7 +401,11 @@ public abstract class AbstractGeneralTests {
         assertEquals(
                 altname,
                 driver.findElement(By.id("findspot_alt_names")).getAttribute("value"));
-        driver.findElement(By.name("findspotfindcategory"));        //TODO
+
+
+        assertEquals(findspotfindcategory,
+                new Select(driver.findElement(By.name("findspotfindcategory"))).getFirstSelectedOption().getText());
+
         assertEquals(description,
                 driver.findElement(By.id("findspot_description")).getAttribute("value"));
 
