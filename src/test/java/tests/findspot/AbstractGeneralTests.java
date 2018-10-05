@@ -14,24 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public abstract class AbstractGeneralTests {
-    private static String urlEnterFindspot = "http://141.2.2.130:8080/AFE_HD/enter_findspot";
-    private static String urlFindspotEntered = "http://141.2.2.130:8080/AFE_HD/findspot_entered";
-    private static String urlAllFindspot = "http.//141.2.2.130:8080/AFE_HD/fs_all";
-    private static String login = "http://141.2.2.130:8080/AFE_HD/j_security_check?j_username=karsten&j_password=karsten&x=0&y=0";
+    private String urlEnterFindspot = "http://141.2.2.130:8080/AFE_HD/enter_findspot";
+    private String urlFindspotEntered = "http://141.2.2.130:8080/AFE_HD/findspot_entered";
+    private String urlAllFindspot = "http://141.2.2.130:8080/AFE_HD/fs_all";
+    private String login = "http://141.2.2.130:8080/AFE_HD/j_security_check?j_username=karsten&j_password=karsten&x=0&y=0";
     static WebDriver driver = null;
 
 
     public void login() {
         driver.navigate().to(login);
-    }
-
-    public boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     @AfterEach
@@ -53,17 +44,17 @@ public abstract class AbstractGeneralTests {
     @Test
     public void enterAltNameField() {
         driver.navigate().to(urlEnterFindspot);
-        WebElement name = driver.findElement(By.id("findspot_alt_names"));
-        name.sendKeys("test");
-        assertEquals("test", name.getAttribute("value"));
+        WebElement altNames = driver.findElement(By.id("findspot_alt_names"));
+        altNames.sendKeys("test");
+        assertEquals("test", altNames.getAttribute("value"));
     }
 
     @Disabled
     @Test
     public void chooseFindCategory() {
         driver.navigate().to(urlEnterFindspot);
-        WebElement name = driver.findElement(By.name("findspotfindcategory"));
-        Select select = new Select(name);
+        WebElement findCategory = driver.findElement(By.name("findspotfindcategory"));
+        Select select = new Select(findCategory);
         //TODO need values
         assertEquals("todo", select.getOptions().get(0).getText());
     }
@@ -72,8 +63,8 @@ public abstract class AbstractGeneralTests {
     @Test
     public void chooseDiscoveryType() {
         driver.navigate().to(urlEnterFindspot);
-        WebElement name = driver.findElement(By.name("discoverytype"));
-        Select select = new Select(name);
+        WebElement discoverytype = driver.findElement(By.name("discoverytype"));
+        Select select = new Select(discoverytype);
         //TODO need values
         assertEquals("todo", select.getOptions().get(0).getText());
     }
@@ -82,8 +73,8 @@ public abstract class AbstractGeneralTests {
     @Test
     public void chooseDepositionType() {
         driver.navigate().to(urlEnterFindspot);
-        WebElement name = driver.findElement(By.name("depositiontype"));
-        Select select = new Select(name);
+        WebElement depositiontype = driver.findElement(By.name("depositiontype"));
+        Select select = new Select(depositiontype);
         //TODO need values
         assertEquals("todo", select.getOptions().get(0).getText());
     }
@@ -220,20 +211,17 @@ public abstract class AbstractGeneralTests {
     @Test
     public void enterPlace() {
         driver.navigate().to(urlEnterFindspot);
-        WebElement adminDivision = driver.findElement(By.id("autocomplete_place"));
-        adminDivision.sendKeys("a");
-        assertEquals("a", adminDivision.getAttribute("value"));
-        WebElement adminDivisionParent = adminDivision.findElements(By.xpath("..")).get(0);
+        WebElement place = driver.findElement(By.id("autocomplete_place"));
+        place.sendKeys("a");
+        assertEquals("a", place.getAttribute("value"));
+        WebElement placeParent = place.findElements(By.xpath("..")).get(0);
         new WebDriverWait(driver, 2).until(webDriver ->
-                !adminDivisionParent.findElement(By.id("autocomplete_place_choices"))
-                        .getText()
-                        .isEmpty()
-        );
+                isVisible(driver.findElement(By.id( "autocomplete_place_choices"))));
         WebElement choices = driver.findElement(By.id("autocomplete_place_choices"));
         assertTrue(choices.getText().contains("bitte mindestens 3 Zeichen eingeben ..."));
 
-        WebElement spinner = adminDivisionParent.findElement(By.id("indicator4"));
-        adminDivision.sendKeys("bc");
+        WebElement spinner = placeParent.findElement(By.id("indicator4"));
+        place.sendKeys("bc");
         //spinner becomes visible after a short time    //Too fast to test, what do? TODO
         try {
             new WebDriverWait(driver, 2).until(webDriver -> isVisible(spinner));
@@ -351,6 +339,99 @@ public abstract class AbstractGeneralTests {
 
         bibliographyId0 = driver.findElement(By.id("autocomplete_bibliography_id_0"));
         assertTrue(bibliographyId0.getAttribute("value").contains("Das Ende der keltischen Münzgeldwirtschaft am Mittelrhein."));
+    }
+
+    @Test
+    public void createFindspot(){
+
+        final String name = "testFindspot";
+        final String altname = "altname";
+        final String description = "this is a test";
+        final String latidtude = "50.116784";
+        final String longitude = "8.649813";
+        final String division = "Frankfurt am Main";
+        final String link = "link";
+        final String bib = "Wigg";
+
+        final int countSpots = this.countFindSpot(name);
+
+
+        driver.navigate().to(urlEnterFindspot);
+        driver.findElement(By.id("findspot_name")).sendKeys(name);
+
+        driver.findElement(By.id("findspot_alt_names")).sendKeys(altname);
+        driver.findElement(By.name("findspotfindcategory"));        //TODO
+        driver.findElement(By.name("discoverytype"));               //TODO
+        driver.findElement(By.name("depositiontype"));              //TODO
+        ;
+        driver.findElement(By.id("findspot_description")).sendKeys(description);
+
+        driver.findElement(By.id("findspot_latitude")).sendKeys(latidtude);
+
+        driver.findElement(By.id("findspot_longitude")).sendKeys(longitude);
+        driver.findElement(By.id("autocomplete_adminDivisionFilter")); //no filter
+
+        driver.findElement(By.id("autocomplete_adminDivision"))
+                .sendKeys(division);
+        new WebDriverWait(driver, 5).until(webDriver ->
+                isVisible(driver.findElement(By.id("autocomplete_adminDivision_choices")))
+        );
+        driver.findElement(By.id("DE_06_412_000")).click();
+
+        driver.findElement(By.id("link")).sendKeys(link);
+
+        driver.findElement(By.id("autocomplete_bibliography_id_0"))
+                .sendKeys(bib);
+        new WebDriverWait(driver, 2).until(webDriver ->
+            isVisible(driver.findElement(By.id("autocomplete_bibliography_choices_id_0"))));
+        driver.findElement(By.id("2")).click();
+        driver.findElement(By.xpath("//input[@type='submit' and @value='Enter Findspot']")).click();
+
+
+        System.err.println(driver.getCurrentUrl());
+        assertEquals(this.urlFindspotEntered,
+                driver.getCurrentUrl());
+
+        //tests
+        assertEquals(
+                name,
+                driver.findElement(By.id("findspot_name")).getAttribute("value"));
+        assertEquals(
+                altname,
+                driver.findElement(By.id("findspot_alt_names")).getAttribute("value"));
+        driver.findElement(By.name("findspotfindcategory"));        //TODO
+        assertEquals(description,
+                driver.findElement(By.id("findspot_description")).getAttribute("value"));
+
+        assertEquals(latidtude,
+            driver.findElement(By.id("findspot_latitude")).getAttribute("value"));
+
+
+        assertEquals(longitude,
+            driver.findElement(By.id("findspot_longitude")).getAttribute("value"));
+
+        assertTrue(driver.findElement(By.id("autocomplete_adminDivision"))
+            .getAttribute("value")
+            .contains(division));
+
+        assertEquals(link,
+                driver.findElement(By.id("link")).getAttribute("value"));
+
+        assertTrue(driver.findElement(By.id("autocomplete_bibliography_id_0"))
+                .getAttribute("value")
+                .contains(bib));
+
+        //Count of Spot with name "testSpot" should be increased by 1
+        assertEquals(countSpots+1,
+            countFindSpot(name));
+
+    }
+
+    public int countFindSpot(String name){
+        driver.navigate().to(urlAllFindspot);
+        return driver.findElement(By.tagName("tbody"))
+                .findElements(By.xpath("//tr/td[2 and text()='"+name+"']"))
+                .size();
 
     }
 }
