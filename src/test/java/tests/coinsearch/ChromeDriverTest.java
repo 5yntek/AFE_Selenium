@@ -1,3 +1,5 @@
+package tests.coinsearch;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -5,6 +7,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import tests.SeleniumConfig;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -12,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class ChromeDriverTest extends AbstractGeneralTests {
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         driver = new SeleniumConfig().getChromeDriver();
         driver.navigate().to("http://pecunia2.zaw.uni-heidelberg.de/AFE_HD/coin_search_detailed");
     }

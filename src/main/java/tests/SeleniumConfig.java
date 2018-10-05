@@ -1,9 +1,12 @@
+package tests;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,9 +16,9 @@ import java.util.*;
 public class SeleniumConfig {
 
     private static List<String> firefoxDrivers = List.of("E:\\Java\\geckodriver.exe",
-            "/home/patrick/Java/geckodriver");
+            "/home/xyntek/Java/geckodriver");
     private static List<String> chromeDrivers = List.of("E:\\Java\\chromedriver.exe",
-            "/home/patrick/Java/chromedriver");
+            "/home/xyntek/Java/chromedriver");
 
 
     private Optional<Path> findFirstDriver(Collection<String> possibleDriver){
@@ -36,6 +39,7 @@ public class SeleniumConfig {
     private WebDriver loadFirefoxDriver(Path location) {
         Optional<Path> d = findFirefoxDriver();
         System.setProperty("webdriver.gecko.driver", d.orElseThrow().toString());
+        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"/dev/null");
         Capabilities capabilities = DesiredCapabilities.firefox();
         return new FirefoxDriver(capabilities);
     }
@@ -47,11 +51,11 @@ public class SeleniumConfig {
         return new ChromeDriver(capabilities);
     }
 
-    public WebDriver getChromeDriver() {
-        return loadChromeDriver(findChromeDriver().orElseThrow());
+    public WebDriver getChromeDriver() throws IOException {
+        return loadChromeDriver(findChromeDriver().orElseThrow(()->new IOException("no Chrome Driver found")));
     }
 
-    public WebDriver getFireFoxDriver() {
-        return loadFirefoxDriver(findFirefoxDriver().orElseThrow());
+    public WebDriver getFireFoxDriver() throws IOException {
+        return loadFirefoxDriver(findFirefoxDriver().orElseThrow(()->new IOException("no Chrome Driver found")));
     }
 }
