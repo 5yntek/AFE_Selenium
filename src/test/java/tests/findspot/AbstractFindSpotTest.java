@@ -15,7 +15,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public abstract class AbstractGeneralTests {
+public abstract class AbstractFindSpotTest {
     private String urlEnterFindspot = "http://141.2.2.130:8080/AFE_HD/enter_findspot";
     private String urlFindspotEntered = "http://141.2.2.130:8080/AFE_HD/findspot_entered";
     private String urlAllFindspot = "http://141.2.2.130:8080/AFE_HD/fs_all";
@@ -34,13 +34,7 @@ public abstract class AbstractGeneralTests {
     }
 
 
-    @Test
-    public void enterNameField() {
-        driver.navigate().to(urlEnterFindspot);
-        WebElement name = driver.findElement(By.id("findspot_name"));
-        name.sendKeys("test");
-        assertEquals("test", name.getAttribute("value"));
-    }
+
 
 
     @Test
@@ -192,8 +186,8 @@ public abstract class AbstractGeneralTests {
                         .getText()
                         .isEmpty()
         );
-        WebElement choises = driver.findElement(By.id("autocomplete_adminDivision_choices"));
-        assertTrue(choises.getText().contains("bitte mindestens 3 Zeichen eingeben ..."));
+        WebElement choices = driver.findElement(By.id("autocomplete_adminDivision_choices"));
+        assertTrue(choices.getText().contains("bitte mindestens 3 Zeichen eingeben ..."));
         adminDivision.sendKeys("bc");
 
         //check spinning loading img
@@ -223,14 +217,9 @@ public abstract class AbstractGeneralTests {
 
         WebElement spinner = placeParent.findElement(By.id("indicator4"));
         place.sendKeys("bc");
-        //spinner becomes visible after a short time    //Too fast to test, what do? TODO
-        try {
-            new WebDriverWait(driver, 2).until(webDriver -> isVisible(spinner));
-            //spins a few times then disappears again
-            new WebDriverWait(driver, 2).until(webDriver -> !isVisible(spinner));
-        } catch (Exception e) {
-            //TODo
-        }
+        new WebDriverWait(driver, 2).until(webDriver -> isVisible(spinner));
+        //spins a few times then disappears again
+        new WebDriverWait(driver, 2).until(webDriver -> !isVisible(spinner));
     }
 
     @Test
@@ -364,8 +353,8 @@ public abstract class AbstractGeneralTests {
 
         driver.findElement(By.id("findspot_alt_names")).sendKeys(altname);
         driver.findElement(By.name("findspotfindcategory")).sendKeys(findspotfindcategory);
-        driver.findElement(By.name("discoverytype"));               //TODO is omitted?
-        driver.findElement(By.name("depositiontype"));              //TODO is omitted?
+        driver.findElement(By.name("discoverytype"));
+        driver.findElement(By.name("depositiontype"));
 
         driver.findElement(By.id("findspot_description")).sendKeys(description);
 
@@ -391,7 +380,6 @@ public abstract class AbstractGeneralTests {
         driver.findElement(By.xpath("//input[@type='submit' and @value='Enter Findspot']")).click();
 
 
-        System.err.println(driver.getCurrentUrl());
         assertEquals(this.urlFindspotEntered,
                 driver.getCurrentUrl());
         //tests
